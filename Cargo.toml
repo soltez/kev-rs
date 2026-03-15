@@ -6,6 +6,9 @@ description = "Cactus Kev's 32-bit card integer library for Rust"
 license = "LGPL-3.0-only"
 
 [dependencies]
+num-traits = "0.2"
+num-derive = "0.4"
+thiserror = "2"
 
 [dev-dependencies]
 rstest = "0.25"
