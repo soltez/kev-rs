@@ -8,6 +8,7 @@ license = "LGPL-3.0-only"
 [dependencies]
 
 [dev-dependencies]
+rstest = "0.25"
 
 [profile.release]
 opt-level = 3
