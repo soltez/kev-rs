@@ -77,6 +77,8 @@ mod blog_example_tests {
     use rstest::rstest;
 
     #[rstest]
+    #[case(&[CardInt::CardAs], 0x1)]
+    #[case(&[CardInt::CardAs, CardInt::CardKh], 0x0)]
     #[case(&[CardInt::CardAs, CardInt::CardKs, CardInt::CardQs, CardInt::CardJs, CardInt::CardTs], 0x1)]
     #[case(&[CardInt::CardAh, CardInt::CardKh, CardInt::CardQh, CardInt::CardJh, CardInt::CardTh], 0x2)]
     #[case(&[CardInt::CardAd, CardInt::CardKd, CardInt::CardQd, CardInt::CardJd, CardInt::CardTd], 0x4)]
