@@ -4,11 +4,15 @@ version = "0.1.0"
 edition = "2024"
 description = "Cactus Kev's 32-bit card integer library for Rust"
 license = "LGPL-3.0-only"
+repository = "https://github.com/soltez/kev-rs"
 
 [dependencies]
 num-traits = "0.2"
 num-derive = "0.4"
 thiserror = "2"
+
+[lib]
+name = "kev"
 
 [dev-dependencies]
 rstest = "0.25"
