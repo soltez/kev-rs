@@ -1,3 +1,37 @@
+//! # kev-rs
+//!
+//! A Rust implementation of Cactus Kev's 32-bit card integer encoding.
+//!
+//! Each playing card is represented as a `u32` with rank, suit, prime, and
+//! one-hot rank bits packed into a single integer. This layout enables
+//! efficient hand evaluation using bitwise operations and prime-product
+//! lookup tables.
+//!
+//! ## Bit layout
+//!
+//! ```text
+//! +--------+--------+--------+--------+
+//! |xxxbbbbb|bbbbbbbb|cdhsrrrr|xxpppppp|
+//! +--------+--------+--------+--------+
+//!
+//! Bits 28–16: b = one-hot rank bit
+//! Bits 15–12: cdhs = one-hot suit nibble (c=clubs, d=diamonds, h=hearts, s=spades)
+//! Bits 11– 8: r = rank index (deuce=0, trey=1, ..., ace=12)
+//! Bits  5– 0: p = rank prime  (deuce=2, trey=3, ..., ace=41)
+//! ```
+//!
+//! ## Usage
+//!
+//! ```rust
+//! use kev_rs::CardInt;
+//!
+//! let ace_of_spades = CardInt::CardAs;
+//! let ace_of_clubs = CardInt::CardAc;
+//! let king_of_clubs = CardInt::new("Kc").unwrap();
+//! assert_eq!(ace_of_spades.rank(), ace_of_clubs.rank());
+//! assert_eq!(ace_of_clubs.suit(), king_of_clubs.suit());
+//! ```
+
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use thiserror::Error;
@@ -45,7 +79,7 @@ impl Rank {
     ///
     /// Accepts both upper- and lowercase letters (`A`/`a` through `2`), plus
     /// `T`/`t` for Ten. Returns `None` for any unrecognised character.
-    pub fn from_char(value: char) -> Option<Self> {
+    fn from_char(value: char) -> Option<Self> {
         match value {
             'A' | 'a' => Some(Rank::Ace),
             'K' | 'k' => Some(Rank::King),
@@ -119,7 +153,7 @@ impl Suit {
     /// Accepts Unicode suit symbols (`♠ ♤ ♥ ♡ ♦ ♢ ♣ ♧`) as well as ASCII
     /// letters (`S`/`s`, `H`/`h`, `D`/`d`, `C`/`c`). Returns `None` for any
     /// unrecognised character.
-    pub fn from_char(value: char) -> Option<Self> {
+    fn from_char(value: char) -> Option<Self> {
         match value {
             '♤' | '♠' | 'S' | 's' => Some(Suit::Spade),
             '♡' | '♥' | 'H' | 'h' => Some(Suit::Heart),
@@ -179,7 +213,7 @@ mod suit_tests {
 /// ```
 ///
 /// Variants are named `Card<Rank><Suit>` where rank uses its conventional
-/// character (`A K Q J T 9 … 2`) and suit uses its initial (`s h d c`).
+/// character (`A K Q J T 9 ... 2`) and suit uses its initial (`s h d c`).
 #[repr(u32)]
 #[derive(FromPrimitive, PartialEq, Debug, Clone, Copy)]
 pub enum CardInt {
@@ -252,8 +286,8 @@ pub enum CardError {
 impl CardInt {
     /// Constructs a `CardInt` from a two-character string such as `"As"` or `"Td"`.
     ///
-    /// The first character is parsed as a [`Rank`] via [`Rank::from_char`] and
-    /// the second as a [`Suit`] via [`Suit::from_char`]. Returns [`CardError`] if
+    /// The first character is parsed as a [`Rank`] via `Rank::from_char` and
+    /// the second as a [`Suit`] via `Suit::from_char`. Returns [`CardError`] if
     /// either character is unrecognised or the string is not exactly two
     /// characters long.
     pub fn new(s: &str) -> Result<Self, CardError> {
