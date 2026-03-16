@@ -15,8 +15,8 @@
 //! # Examples
 //!
 //! ```
-//! use kev_rs::CardInt;
-//! use kev_rs::hand::{suit_bitwise_and, rank_bitwise_or, prime_product};
+//! use kev::CardInt;
+//! use kev::hand::{suit_bitwise_and, rank_bitwise_or, prime_product};
 //!
 //! let royal_flush = &[
 //!     CardInt::CardAs, CardInt::CardKs, CardInt::CardQs,

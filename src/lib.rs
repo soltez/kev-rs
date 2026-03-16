@@ -23,7 +23,7 @@
 //! ## Usage
 //!
 //! ```rust
-//! use kev_rs::CardInt;
+//! use kev::CardInt;
 //!
 //! let ace_of_spades = CardInt::CardAs;
 //! let ace_of_clubs = CardInt::CardAc;
