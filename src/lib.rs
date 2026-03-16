@@ -2,6 +2,8 @@ use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use thiserror::Error;
 
+pub mod hand;
+
 /// The rank of a playing card, ordered from lowest (Deuce) to highest (Ace).
 ///
 /// The discriminant value is used to access the `PRIMES` table as an index,
