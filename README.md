@@ -24,7 +24,7 @@ Bits  5– 0: p = rank prime  (deuce=2, trey=3, ..., ace=41)
 Cards can be accessed as enum variants or constructed from a two-character string:
 
 ```rust
-use kev_rs::CardInt;
+use kev::CardInt;
 
 let ace_of_spades = CardInt::CardAs;
 let king_of_clubs = CardInt::new("Kc").unwrap();
@@ -50,8 +50,8 @@ The `hand` module exposes three functions over a slice of `CardInt` values:
 | `prime_product`    | 0–5 (prime byte)     | Unique rank-multiset key |
 
 ```rust
-use kev_rs::CardInt;
-use kev_rs::hand::{suit_bitwise_and, rank_bitwise_or, prime_product};
+use kev::CardInt;
+use kev::hand::{suit_bitwise_and, rank_bitwise_or, prime_product};
 
 let royal_flush = &[
     CardInt::CardAs, CardInt::CardKs, CardInt::CardQs,
