@@ -1,6 +1,6 @@
 [package]
 name = "kev-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Cactus Kev's 32-bit card integer library for Rust"
 license = "LGPL-3.0-only"
