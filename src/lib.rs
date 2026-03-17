@@ -27,7 +27,7 @@
 //!
 //! let ace_of_spades = CardInt::CardAs;
 //! let ace_of_clubs = CardInt::CardAc;
-//! let king_of_clubs = CardInt::new("Kc").unwrap();
+//! let king_of_clubs = CardInt::new("Kc").expect("rtfm");
 //! assert_eq!(ace_of_spades.rank(), ace_of_clubs.rank());
 //! assert_eq!(ace_of_clubs.suit(), king_of_clubs.suit());
 //! ```
@@ -326,17 +326,17 @@ impl CardInt {
         let rank_nib: u32 = (*rank as u32) << 8;
         let suit_nib: u32 = (*suit as u32) << 12;
         let onehot: u32 = 1 << (*rank as u32) << 16;
-        CardInt::from_u32(prime | rank_nib | suit_nib | onehot).unwrap()
+        CardInt::from_u32(prime | rank_nib | suit_nib | onehot).expect("unreachable")
     }
 
     /// Extracts the [`Rank`] from this card's face-value field (bits 8–11).
     pub fn rank(&self) -> Rank {
-        Rank::from_u8((*self as u32 >> 8 & 0xF) as u8).unwrap()
+        Rank::from_u8((*self as u32 >> 8 & 0xF) as u8).expect("unreachable")
     }
 
     /// Extracts the [`Suit`] from this card's suit nibble (bits 12–15).
     pub fn suit(&self) -> Suit {
-        Suit::from_u8((*self as u32 >> 12 & 0xF) as u8).unwrap()
+        Suit::from_u8((*self as u32 >> 12 & 0xF) as u8).expect("unreachable")
     }
 }
 
