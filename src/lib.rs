@@ -32,8 +32,6 @@
 //! assert_eq!(ace_of_clubs.suit(), king_of_clubs.suit());
 //! ```
 
-use thiserror::Error;
-
 pub mod hand;
 
 /// The rank of a playing card, ordered from lowest (Deuce) to highest (Ace).
@@ -298,18 +296,6 @@ pub enum CardInt {
     Card2c = 0b0000_0000_0000_0001_1000_0000_0000_0010,
 }
 
-#[derive(Debug, Error)]
-pub enum CardError {
-    #[error("invalid rank: '{0}'")]
-    InvalidRank(char),
-
-    #[error("invalid suit: '{0}'")]
-    InvalidSuit(char),
-
-    #[error("invalid input: '{0}'")]
-    InvalidInput(String),
-}
-
 impl CardInt {
     fn from_u32(n: u32) -> Option<Self> {
         match n {
@@ -372,22 +358,16 @@ impl CardInt {
     /// Constructs a `CardInt` from a two-character string such as `"As"` or `"Td"`.
     ///
     /// The first character is parsed as a [`Rank`] via `Rank::from_char` and
-    /// the second as a [`Suit`] via `Suit::from_char`. Returns [`CardError`] if
-    /// either character is unrecognised or the string is not exactly two
-    /// characters long.
-    pub fn new(s: &str) -> Result<Self, CardError> {
-        let invalid = || CardError::InvalidInput(s.to_string());
+    /// the second as a [`Suit`] via `Suit::from_char`. Returns `None` if either
+    /// character is unrecognised or the string is not exactly two characters long.
+    pub fn new(s: &str) -> Option<Self> {
         let mut chars = s.chars();
-        let rank: Rank = chars
-            .next()
-            .ok_or_else(invalid)
-            .and_then(|c| Rank::from_char(c).ok_or(CardError::InvalidRank(c)))?;
-        let suit: Suit = chars
-            .next()
-            .ok_or_else(invalid)
-            .and_then(|c| Suit::from_char(c).ok_or(CardError::InvalidSuit(c)))?;
-        chars.next().map_or(Ok(()), |_| Err(invalid()))?;
-        Ok(Self::_new(&rank, &suit))
+        let rank = Rank::from_char(chars.next()?)?;
+        let suit = Suit::from_char(chars.next()?)?;
+        if chars.next().is_some() {
+            return None;
+        }
+        Some(Self::_new(&rank, &suit))
     }
 
     /// Constructs a `CardInt` from a [`Rank`] and [`Suit`] by computing the
@@ -552,34 +532,20 @@ mod card_integer_tests {
     #[case("3c", CardInt::Card3c)]
     #[case("2c", CardInt::Card2c)]
     fn new(#[case] input: &str, #[case] expected: CardInt) {
-        assert_eq!(CardInt::new(input).ok(), Some(expected));
+        assert_eq!(CardInt::new(input), Some(expected));
     }
 
     #[rstest]
     #[case("AsKs")]
     #[case("K")]
     #[case("")]
-    fn new_invalid_input(#[case] input: &str) {
-        let actual = CardInt::new(input);
-        let expect = format!("invalid input: '{}'", input);
-        assert_eq!(actual.unwrap_err().to_string(), expect);
-    }
-
-    #[rstest]
     #[case("Xc")]
     #[case(" D")]
     #[case("x")]
-    fn new_invalid_rank(#[case] input: &str) {
-        let actual = CardInt::new(input);
-        assert!(actual.unwrap_err().to_string().starts_with("invalid rank"));
-    }
-
-    #[rstest]
     #[case("ax")]
     #[case("2 ")]
     #[case("jx2")]
-    fn new_invalid_suit(#[case] input: &str) {
-        let actual = CardInt::new(input);
-        assert!(actual.unwrap_err().to_string().starts_with("invalid suit"));
+    fn new_invalid(#[case] input: &str) {
+        assert_eq!(CardInt::new(input), None);
     }
 }
