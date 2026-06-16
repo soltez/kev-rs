@@ -32,8 +32,6 @@
 //! assert_eq!(ace_of_clubs.suit(), king_of_clubs.suit());
 //! ```
 
-use num_derive::FromPrimitive;
-use num_traits::FromPrimitive;
 use thiserror::Error;
 
 pub mod hand;
@@ -44,7 +42,7 @@ pub mod hand;
 /// compute the card's face value, and activate the one-hot bit position
 /// in the upper 16 bits of the Cactus Kev encoding.
 #[repr(u8)]
-#[derive(FromPrimitive, PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Rank {
     /// Two (2)
     Deuce = 0,
@@ -75,6 +73,25 @@ pub enum Rank {
 }
 
 impl Rank {
+    fn from_u8(n: u8) -> Option<Self> {
+        match n {
+            0x00 => Some(Self::Deuce),
+            0x01 => Some(Self::Trey),
+            0x02 => Some(Self::Four),
+            0x03 => Some(Self::Five),
+            0x04 => Some(Self::Six),
+            0x05 => Some(Self::Seven),
+            0x06 => Some(Self::Eight),
+            0x07 => Some(Self::Nine),
+            0x08 => Some(Self::Ten),
+            0x09 => Some(Self::Jack),
+            0x0A => Some(Self::Queen),
+            0x0B => Some(Self::King),
+            0x0C => Some(Self::Ace),
+            _ => None,
+        }
+    }
+
     /// Parses a single character into a `Rank`.
     ///
     /// Accepts both upper- and lowercase letters (`A`/`a` through `2`), plus
@@ -135,7 +152,7 @@ mod rank_tests {
 /// card integer, so flush detection can be tested with a
 /// single bitwise AND.
 #[repr(u8)]
-#[derive(FromPrimitive, PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Suit {
     /// Spades (♠)
     Spade = 0x1,
@@ -148,6 +165,16 @@ pub enum Suit {
 }
 
 impl Suit {
+    fn from_u8(n: u8) -> Option<Self> {
+        match n {
+            0x1 => Some(Self::Spade),
+            0x2 => Some(Self::Heart),
+            0x4 => Some(Self::Diamond),
+            0x8 => Some(Self::Club),
+            _ => None,
+        }
+    }
+
     /// Parses a single character into a `Suit`.
     ///
     /// Accepts Unicode suit symbols (`♠ ♤ ♥ ♡ ♦ ♢ ♣ ♧`) as well as ASCII
@@ -215,7 +242,7 @@ mod suit_tests {
 /// Variants are named `Card<Rank><Suit>` where rank uses its conventional
 /// character (`A K Q J T 9 ... 2`) and suit uses its initial (`s h d c`).
 #[repr(u32)]
-#[derive(FromPrimitive, PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug, Clone, Copy)]
 pub enum CardInt {
     CardAs = 0b0001_0000_0000_0000_0001_1100_0010_1001,
     CardKs = 0b0000_1000_0000_0000_0001_1011_0010_0101,
@@ -284,6 +311,64 @@ pub enum CardError {
 }
 
 impl CardInt {
+    fn from_u32(n: u32) -> Option<Self> {
+        match n {
+            0x10001C29 => Some(Self::CardAs),
+            0x08001B25 => Some(Self::CardKs),
+            0x04001A1F => Some(Self::CardQs),
+            0x0200191D => Some(Self::CardJs),
+            0x01001817 => Some(Self::CardTs),
+            0x00801713 => Some(Self::Card9s),
+            0x00401611 => Some(Self::Card8s),
+            0x0020150D => Some(Self::Card7s),
+            0x0010140B => Some(Self::Card6s),
+            0x00081307 => Some(Self::Card5s),
+            0x00041205 => Some(Self::Card4s),
+            0x00021103 => Some(Self::Card3s),
+            0x00011002 => Some(Self::Card2s),
+            0x10002C29 => Some(Self::CardAh),
+            0x08002B25 => Some(Self::CardKh),
+            0x04002A1F => Some(Self::CardQh),
+            0x0200291D => Some(Self::CardJh),
+            0x01002817 => Some(Self::CardTh),
+            0x00802713 => Some(Self::Card9h),
+            0x00402611 => Some(Self::Card8h),
+            0x0020250D => Some(Self::Card7h),
+            0x0010240B => Some(Self::Card6h),
+            0x00082307 => Some(Self::Card5h),
+            0x00042205 => Some(Self::Card4h),
+            0x00022103 => Some(Self::Card3h),
+            0x00012002 => Some(Self::Card2h),
+            0x10004C29 => Some(Self::CardAd),
+            0x08004B25 => Some(Self::CardKd),
+            0x04004A1F => Some(Self::CardQd),
+            0x0200491D => Some(Self::CardJd),
+            0x01004817 => Some(Self::CardTd),
+            0x00804713 => Some(Self::Card9d),
+            0x00404611 => Some(Self::Card8d),
+            0x0020450D => Some(Self::Card7d),
+            0x0010440B => Some(Self::Card6d),
+            0x00084307 => Some(Self::Card5d),
+            0x00044205 => Some(Self::Card4d),
+            0x00024103 => Some(Self::Card3d),
+            0x00014002 => Some(Self::Card2d),
+            0x10008C29 => Some(Self::CardAc),
+            0x08008B25 => Some(Self::CardKc),
+            0x04008A1F => Some(Self::CardQc),
+            0x0200891D => Some(Self::CardJc),
+            0x01008817 => Some(Self::CardTc),
+            0x00808713 => Some(Self::Card9c),
+            0x00408611 => Some(Self::Card8c),
+            0x0020850D => Some(Self::Card7c),
+            0x0010840B => Some(Self::Card6c),
+            0x00088307 => Some(Self::Card5c),
+            0x00048205 => Some(Self::Card4c),
+            0x00028103 => Some(Self::Card3c),
+            0x00018002 => Some(Self::Card2c),
+            _ => None,
+        }
+    }
+
     /// Constructs a `CardInt` from a two-character string such as `"As"` or `"Td"`.
     ///
     /// The first character is parsed as a [`Rank`] via `Rank::from_char` and
@@ -342,7 +427,7 @@ impl CardInt {
 
 #[cfg(test)]
 mod card_integer_tests {
-    use super::{CardInt, FromPrimitive, Rank, Suit};
+    use super::{CardInt, Rank, Suit};
     use rstest::rstest;
 
     #[rstest]
