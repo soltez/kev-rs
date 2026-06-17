@@ -394,6 +394,25 @@ impl CardInt {
         CardInt::from_u32(prime | rank_nib | suit_nib | onehot).unwrap()
     }
 
+    /// Returns a compact one-byte encoding of this card.
+    ///
+    /// Bits 7-4 hold the suit nibble (clubs=8, diamonds=4, hearts=2, spades=1).
+    /// Bits 3-0 hold the rank index (deuce=0, trey=1, ..., ace=12).
+    /// Reversible via [`CardInt::from_u8`]. A zero byte is never produced.
+    pub fn to_u8(&self) -> u8 {
+        (*self as u32 >> 8) as u8
+    }
+
+    /// Reconstructs a [`CardInt`] from a byte produced by [`CardInt::to_u8`].
+    ///
+    /// Returns `None` if `byte` is `0` (absent card sentinel) or does not
+    /// encode a valid (suit, rank) combination.
+    pub fn from_u8(byte: u8) -> Option<Self> {
+        let rank = Rank::from_u8(byte & 0xF)?;
+        let suit = Suit::from_u8(byte >> 4)?;
+        Some(Self::_new(&rank, &suit))
+    }
+
     /// Extracts the [`Rank`] from this card's face-value field (bits 8–11).
     pub fn rank(&self) -> Rank {
         Rank::from_u8((*self as u32 >> 8 & 0xF) as u8).unwrap()
@@ -547,5 +566,69 @@ mod card_integer_tests {
     #[case("jx2")]
     fn new_invalid(#[case] input: &str) {
         assert_eq!(CardInt::new(input), None);
+    }
+
+    #[rstest]
+    #[case(CardInt::CardAs)]
+    #[case(CardInt::CardKs)]
+    #[case(CardInt::CardQs)]
+    #[case(CardInt::CardJs)]
+    #[case(CardInt::CardTs)]
+    #[case(CardInt::Card9s)]
+    #[case(CardInt::Card8s)]
+    #[case(CardInt::Card7s)]
+    #[case(CardInt::Card6s)]
+    #[case(CardInt::Card5s)]
+    #[case(CardInt::Card4s)]
+    #[case(CardInt::Card3s)]
+    #[case(CardInt::Card2s)]
+    #[case(CardInt::CardAh)]
+    #[case(CardInt::CardKh)]
+    #[case(CardInt::CardQh)]
+    #[case(CardInt::CardJh)]
+    #[case(CardInt::CardTh)]
+    #[case(CardInt::Card9h)]
+    #[case(CardInt::Card8h)]
+    #[case(CardInt::Card7h)]
+    #[case(CardInt::Card6h)]
+    #[case(CardInt::Card5h)]
+    #[case(CardInt::Card4h)]
+    #[case(CardInt::Card3h)]
+    #[case(CardInt::Card2h)]
+    #[case(CardInt::CardAd)]
+    #[case(CardInt::CardKd)]
+    #[case(CardInt::CardQd)]
+    #[case(CardInt::CardJd)]
+    #[case(CardInt::CardTd)]
+    #[case(CardInt::Card9d)]
+    #[case(CardInt::Card8d)]
+    #[case(CardInt::Card7d)]
+    #[case(CardInt::Card6d)]
+    #[case(CardInt::Card5d)]
+    #[case(CardInt::Card4d)]
+    #[case(CardInt::Card3d)]
+    #[case(CardInt::Card2d)]
+    #[case(CardInt::CardAc)]
+    #[case(CardInt::CardKc)]
+    #[case(CardInt::CardQc)]
+    #[case(CardInt::CardJc)]
+    #[case(CardInt::CardTc)]
+    #[case(CardInt::Card9c)]
+    #[case(CardInt::Card8c)]
+    #[case(CardInt::Card7c)]
+    #[case(CardInt::Card6c)]
+    #[case(CardInt::Card5c)]
+    #[case(CardInt::Card4c)]
+    #[case(CardInt::Card3c)]
+    #[case(CardInt::Card2c)]
+    fn to_u8_from_u8_roundtrip(#[case] card: CardInt) {
+        assert_eq!(CardInt::from_u8(card.to_u8()), Some(card));
+    }
+
+    #[rstest]
+    #[case(0x00)]
+    #[case(0x3F)]
+    fn from_u8_invalid(#[case] byte: u8) {
+        assert_eq!(CardInt::from_u8(byte), None);
     }
 }
