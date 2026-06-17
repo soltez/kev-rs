@@ -1,3 +1,4 @@
+#![no_std]
 //! # kev-rs
 //!
 //! A Rust implementation of Cactus Kev's 32-bit card integer encoding.
