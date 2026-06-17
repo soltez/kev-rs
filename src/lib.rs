@@ -360,6 +360,7 @@ impl CardInt {
     /// The first character is parsed as a [`Rank`] via `Rank::from_char` and
     /// the second as a [`Suit`] via `Suit::from_char`. Returns `None` if either
     /// character is unrecognised or the string is not exactly two characters long.
+    #[must_use]
     pub fn new(s: &str) -> Option<Self> {
         let mut chars = s.chars();
         let rank = Rank::from_char(chars.next()?)?;
@@ -399,6 +400,7 @@ impl CardInt {
     /// Bits 7-4 hold the suit nibble (clubs=8, diamonds=4, hearts=2, spades=1).
     /// Bits 3-0 hold the rank index (deuce=0, trey=1, ..., ace=12).
     /// Reversible via [`CardInt::from_u8`]. A zero byte is never produced.
+    #[must_use]
     pub fn to_u8(&self) -> u8 {
         (*self as u32 >> 8) as u8
     }
@@ -407,6 +409,7 @@ impl CardInt {
     ///
     /// Returns `None` if `byte` is `0` (absent card sentinel) or does not
     /// encode a valid (suit, rank) combination.
+    #[must_use]
     pub fn from_u8(byte: u8) -> Option<Self> {
         let rank = Rank::from_u8(byte & 0xF)?;
         let suit = Suit::from_u8(byte >> 4)?;
@@ -414,11 +417,13 @@ impl CardInt {
     }
 
     /// Extracts the [`Rank`] from this card's face-value field (bits 8–11).
+    #[must_use]
     pub fn rank(&self) -> Rank {
         Rank::from_u8((*self as u32 >> 8 & 0xF) as u8).unwrap()
     }
 
     /// Extracts the [`Suit`] from this card's suit nibble (bits 12–15).
+    #[must_use]
     pub fn suit(&self) -> Suit {
         Suit::from_u8((*self as u32 >> 12 & 0xF) as u8).unwrap()
     }

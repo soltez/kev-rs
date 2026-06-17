@@ -40,6 +40,7 @@ use crate::CardInt;
 /// # Returns
 /// A `u8` with one of the suit bits set (`0x1` spades, `0x2` hearts,
 /// `0x4` diamonds, `0x8` clubs) when the hand is flush, or `0x0` otherwise.
+#[must_use]
 pub fn suit_bitwise_and(hand: &[CardInt]) -> u8 {
     (hand.iter().fold(0xF000, |a, b| a & *b as u32) >> 12) as u8
 }
@@ -53,6 +54,7 @@ pub fn suit_bitwise_and(hand: &[CardInt]) -> u8 {
 /// # Returns
 /// A `u16` rank-presence bitmask. For example, a hand containing `[2s, 3s,
 /// 4s, 5s, 6s]` returns `0x001F` and `[As]` returns `0x1000`.
+#[must_use]
 pub fn rank_bitwise_or(hand: &[CardInt]) -> u16 {
     (hand.iter().fold(0, |a, b| a | *b as u32) >> 16) as u16
 }
@@ -67,6 +69,7 @@ pub fn rank_bitwise_or(hand: &[CardInt]) -> u16 {
 /// # Returns
 /// A `u32` prime product. Panics on overflow only if the hand is
 /// pathologically large; a standard 5-card hand is well within range.
+#[must_use]
 pub fn prime_product(hand: &[CardInt]) -> u32 {
     hand.iter().fold(1, |a, b| a * (*b as u32 & 0xFF))
 }
